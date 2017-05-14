@@ -1,6 +1,9 @@
 # homebridge-pi
 
-A homebridge LM75 temperature sensor for Raspberry Pi.
+A homebridge LM75 temperature sensor for Banana Pi.
+Based on origial code by Mark Webb-Johnson <mark@webb-johnson.net>.
+See original code here: https://github.com/markwj/homebridge-pi
+
 
 # Installation
 
