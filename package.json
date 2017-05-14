@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+"
+    "url": "git+https://github.com/GreyPeter/homebridge-pi-lm75/"
   },
   "engines": {
     "homebridge": ">=0.2.0",
@@ -20,5 +20,9 @@
     "LM75"	
   ],
   "author": "Peter Harry",
-  "license": ""
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GreyPeter/homebridge-pi-lm75/issues"
+  },
+  "homepage": "https://github.com/GreyPeter/homebridge-pi-lm75#readme"
 }
