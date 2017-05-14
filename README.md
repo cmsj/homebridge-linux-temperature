@@ -1,11 +1,11 @@
 # homebridge-pi
 
-A homebridge sensor for Raspberry Pi.
+A homebridge LM75 temperature sensor for Raspberry Pi.
 
 # Installation
 
 1. Install Homebridge using: `npm install -g homebridge`
-2. Install this plugin using: `npm install -g homebridge-pi-LM75`
+2. Install this plugin using: `npm install -g homebridge-pi-lm75`
 4. Update your Homebridge `config.json` using the sample below.
 
 # Configuration
