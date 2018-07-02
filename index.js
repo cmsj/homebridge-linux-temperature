@@ -17,7 +17,7 @@ function LinuxTemperatureAccessory(log, config)
   this.log = log;
   this.name = config['name'];
   this.lastupdate = 0;
-  this.sensor_path = config['path'];
+  this.sensor_path = config['sensor_path'];
   this.divisor = config['divisor'];
   }
 
