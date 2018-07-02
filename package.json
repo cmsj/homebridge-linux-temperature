@@ -1,6 +1,6 @@
 {
   "name": "homebridge-linux-temperature",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A homebridge temperature sensor for Linux sensors",
   "main": "index.js",
   "scripts": {
