@@ -9,28 +9,30 @@ module.exports = function (homebridge)
   {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-pi", "PiTemperature", PiTemperatureAccessory);
+  homebridge.registerAccessory("homebridge-linux-temp", "LinuxTemperature", LinuxTemperatureAccessory);
   }
 
-function PiTemperatureAccessory(log, config)
+function LinuxTemperatureAccessory(log, config)
   {
   this.log = log;
   this.name = config['name'];
   this.lastupdate = 0;
+  this.sensor_path = config['path'];
+  this.divisor = config['divisor'];
   }
 
-PiTemperatureAccessory.prototype =
+LinuxTemperatureAccessory.prototype =
   {
   getState: function (callback)
     {
     // Only fetch new data once per minute
     if (this.lastupdate + 60 < (Date.now() / 1000 | 0))
       {
-      var data = fs.readFileSync('/sys/class/i2c-adapter/i2c-2/2-0048/temp1_input', 'utf8');
+      var data = fs.readFileSync(this.sensor_path, 'utf8');
       if (typeof data == 'undefined') { return this.log("Failed to read temperature file"); }
-      this.temperature = (0.0+parseInt(data))/1000;
+      this.temperature = (0.0+parseInt(data))/this.divisor;
       }
-    this.log("Rasperberry Pi CPU/GPU temperature at " + this.temperature);
+    this.log("Temperature at " + this.temperature);
     temperatureService.setCharacteristic(Characteristic.CurrentTemperature, this.temperature);
     callback(null, this.temperature);
     },
@@ -47,13 +49,11 @@ PiTemperatureAccessory.prototype =
 
     var data = fs.readFileSync('/proc/cpuinfo', 'utf8');
     if (typeof data == 'undefined') { return this.log("Failed to read /proc/cpuinfo"); }
-    var model = data.match(/Hardware\s+\:\s*(\S+)/)[1] + "/" + data.match(/Revision\s+\:\s*(\S+)/)[1];
-    var serial = data.match(/Serial\s+\:\s*(\S+)/)[1];
+    var model = data.match(/model name\s+\:\s*(\S+)/)[1];
     informationService
-      .setCharacteristic(Characteristic.Manufacturer, "Raspberry")
-      .setCharacteristic(Characteristic.Model, model)
-      .setCharacteristic(Characteristic.SerialNumber, serial);
-    this.log("Model " + model + " Serial " + serial);
+      .setCharacteristic(Characteristic.Manufacturer, "Linux")
+      .setCharacteristic(Characteristic.Model, model);
+    this.log("Model " + model);
 
     temperatureService = new Service.TemperatureSensor(this.name);
     temperatureService

@@ -1,14 +1,14 @@
 {
-  "name": "homebridge-pi-lm75",
+  "name": "homebridge-linux-temperature",
   "version": "1.0.0",
-  "description": "A homebridge LM75 temperature sensor for Raspberry Pi",
+  "description": "A homebridge temperature sensor for Linux sensors",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GreyPeter/homebridge-pi-lm75/"
+    "url": "git+https://github.com/cmsj/homebridge-linux-temperature/"
   },
   "engines": {
     "homebridge": ">=0.2.0",
@@ -16,13 +16,13 @@
   },
   "keywords": [
     "homebridge-plugin",
-    "raspberrypi",
-    "LM75"	
+    "temperature",
+    "linux"	
   ],
-  "author": "Peter Harry",
+  "author": "Chris Jones",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/GreyPeter/homebridge-pi-lm75/issues"
+    "url": "https://github.com/cmsj/homebridge-linux-temperature/issues"
   },
-  "homepage": "https://github.com/GreyPeter/homebridge-pi-lm75#readme"
+  "homepage": "https://github.com/cmsj/homebridge-linux-temperature#readme"
 }
