@@ -9,7 +9,7 @@ See original code here: https://github.com/markwj/homebridge-pi
 # Installation
 
 1. Install Homebridge using: `npm install -g homebridge`
-2. Install this plugin using: `npm install -g homebridge-pi-lm75`
+2. Install this plugin using: `npm install -g homebridge-linux-temperature`
 3. Update your Homebridge `config.json` using the sample below.
 
 # Configuration
