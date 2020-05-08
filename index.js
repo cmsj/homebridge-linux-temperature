@@ -4,6 +4,7 @@ var fs = require('fs');
 
 var Service, Characteristic;
 var temperatureService;
+var { execSync } = require("child_process");
 
 module.exports = function (homebridge)
   {
@@ -19,22 +20,42 @@ function LinuxTemperatureAccessory(log, config)
   this.lastupdate = 0;
   this.sensor_path = config['sensor_path'];
   this.divisor = config['divisor'];
+  this.pollingInterval = config['pollingInterval'];
+
+  var that = this;
+  // Start periodic polling
+  if(this.pollingInterval && this.pollingInterval > 0){
+      setTimeout(function () {
+        that.backgroundPolling()
+      }, this.pollingInterval);
+    }
   }
 
 LinuxTemperatureAccessory.prototype =
   {
-  getState: function (callback)
+    backgroundPolling: function () {
+      // Update Temperature
+      this.getState(function (error, temperature) {
+        if (error) {
+          this.log(error);
+        }
+      }.bind(this));
+  
+      var that = this;
+      setTimeout(function () {
+        // Recursive call after certain time
+        that.backgroundPolling();
+      }, this.pollingInterval);
+    },
+    getState: function (callback)
     {
-    // Only fetch new data once per minute
-    if (this.lastupdate + 60 < (Date.now() / 1000 | 0))
-      {
       var data = fs.readFileSync(this.sensor_path, 'utf8');
       if (typeof data == 'undefined') { return this.log("Failed to read temperature file"); }
       this.temperature = (0.0+parseInt(data))/this.divisor;
-      }
-    this.log("Temperature at " + this.temperature);
-    temperatureService.setCharacteristic(Characteristic.CurrentTemperature, this.temperature);
-    callback(null, this.temperature);
+
+      this.log("Temperature at " + this.temperature);
+      temperatureService.setCharacteristic(Characteristic.CurrentTemperature, this.temperature);
+      callback(null, this.temperature);
     },
 
   identify: function (callback)
@@ -47,13 +68,25 @@ LinuxTemperatureAccessory.prototype =
     {
     var informationService = new Service.AccessoryInformation();
 
-    var data = fs.readFileSync('/proc/cpuinfo', 'utf8');
+    var data = execSync("cat /proc/cpuinfo | grep 'model name' | uniq | cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
     if (typeof data == 'undefined') { return this.log("Failed to read /proc/cpuinfo"); }
-    var model = data.match(/model name\s+\:\s*(\S+)/)[1];
+    
+    var os;
+    
+    try {
+      os = execSync("lsb_release -d|cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
+    } catch (e) {
+      this.log(e)
+    }
+
+    if (!os){
+      os = "Linux";
+    }
+
     informationService
-      .setCharacteristic(Characteristic.Manufacturer, "Linux")
-      .setCharacteristic(Characteristic.Model, model);
-    this.log("Model " + model);
+      .setCharacteristic(Characteristic.Manufacturer, os)
+      .setCharacteristic(Characteristic.Model, data);
+    this.log("Model " + data);
 
     temperatureService = new Service.TemperatureSensor(this.name);
     temperatureService
