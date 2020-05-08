@@ -74,7 +74,7 @@ LinuxTemperatureAccessory.prototype =
     var os;
     
     try {
-      os = execSync("lsb_release_lol -d|cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
+      os = execSync("lsb_release -d|cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
     } catch (e) {
       this.log(e)
     }
