@@ -19,22 +19,42 @@ function LinuxTemperatureAccessory(log, config)
   this.lastupdate = 0;
   this.sensor_path = config['sensor_path'];
   this.divisor = config['divisor'];
+  this.pollingInterval = config['pollingInterval'];
+
+  var that = this;
+  // Start periodic polling
+  if(this.pollingInterval && this.pollingInterval > 0){
+      setTimeout(function () {
+        that.backgroundPolling()
+      }, this.pollingInterval);
+    }
   }
 
 LinuxTemperatureAccessory.prototype =
   {
-  getState: function (callback)
+    backgroundPolling: function () {
+      // Update Temperature
+      this.getState(function (error, temperature) {
+        if (error) {
+          this.log(error);
+        }
+      }.bind(this));
+  
+      var that = this;
+      setTimeout(function () {
+        // Recursive call after certain time
+        that.backgroundPolling();
+      }, this.pollingInterval);
+    },
+    getState: function (callback)
     {
-    // Only fetch new data once per minute
-    if (this.lastupdate + 60 < (Date.now() / 1000 | 0))
-      {
       var data = fs.readFileSync(this.sensor_path, 'utf8');
       if (typeof data == 'undefined') { return this.log("Failed to read temperature file"); }
       this.temperature = (0.0+parseInt(data))/this.divisor;
-      }
-    this.log("Temperature at " + this.temperature);
-    temperatureService.setCharacteristic(Characteristic.CurrentTemperature, this.temperature);
-    callback(null, this.temperature);
+
+      this.log("Temperature at " + this.temperature);
+      temperatureService.setCharacteristic(Characteristic.CurrentTemperature, this.temperature);
+      callback(null, this.temperature);
     },
 
   identify: function (callback)
