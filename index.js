@@ -4,6 +4,7 @@ var fs = require('fs');
 
 var Service, Characteristic;
 var temperatureService;
+var { execSync } = require("child_process");
 
 module.exports = function (homebridge)
   {
@@ -67,13 +68,21 @@ LinuxTemperatureAccessory.prototype =
     {
     var informationService = new Service.AccessoryInformation();
 
-    var data = fs.readFileSync('/proc/cpuinfo', 'utf8');
+    var data = execSync("cat /proc/cpuinfo | grep 'model name' | uniq | cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
     if (typeof data == 'undefined') { return this.log("Failed to read /proc/cpuinfo"); }
-    var model = data.match(/model name\s+\:\s*(\S+)/)[1];
+    
+    var os = "Linux"
+    
+    try {
+      os = execSync("lsb_release -d|cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
+    } catch (e) {
+      this.log(e)
+    }
+
     informationService
-      .setCharacteristic(Characteristic.Manufacturer, "Linux")
-      .setCharacteristic(Characteristic.Model, model);
-    this.log("Model " + model);
+      .setCharacteristic(Characteristic.Manufacturer, os)
+      .setCharacteristic(Characteristic.Model, data);
+    this.log("Model " + data);
 
     temperatureService = new Service.TemperatureSensor(this.name);
     temperatureService
