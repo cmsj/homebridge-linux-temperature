@@ -71,12 +71,16 @@ LinuxTemperatureAccessory.prototype =
     var data = execSync("cat /proc/cpuinfo | grep 'model name' | uniq | cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
     if (typeof data == 'undefined') { return this.log("Failed to read /proc/cpuinfo"); }
     
-    var os = "Linux"
+    var os;
     
     try {
-      os = execSync("lsb_release -d|cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
+      os = execSync("lsb_release_lol -d|cut -d':' -f2|awk '{$1=$1};1'", { encoding: "utf8" });
     } catch (e) {
       this.log(e)
+    }
+
+    if (!os){
+      os = "Linux";
     }
 
     informationService
